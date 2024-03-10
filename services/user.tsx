@@ -1,11 +1,8 @@
 import db from './db.ts';
 import Meth from './meth.ts';
 
-if (!Deno.env.has('EDIFY_USERNAME')) throw new Error('EDIFY_USERNAME not set');
-if (!Deno.env.has('EDIFY_PASSWORD')) throw new Error('EDIFY_PASSWORD not set');
-
-const username = Deno.env.get('EDIFY_USERNAME') as string;
-const password = Deno.env.get('EDIFY_PASSWORD');
+const username = Deno.env.get('EDIFY_USERNAME') || Math.random().toString().slice(3, -1);
+const password = Deno.env.get('EDIFY_PASSWORD') || Math.random().toString().slice(3, -1);
 
 db.set(['users', username], { username, password, isAdmin: true });
 
