@@ -1,8 +1,8 @@
-import { Plugin } from '$fresh/server.ts';
 import { Redirect } from './services/web.ts';
 import AppView, { handler as appHandler } from './routes/edit.tsx';
 import LoginPage, { handler as loginHandler } from './routes/login.tsx';
 import middlewareHandler from './routes/middleware.tsx';
+import { Plugin } from '$fresh/server.ts';
 
 export default function edifyPlugin(): Plugin {
 	const basePath = '/edify';
@@ -30,7 +30,7 @@ export default function edifyPlugin(): Plugin {
 			},
 			{
 				path: `${basePath}/logout`,
-				handler: (req) => new Redirect('/edify').setCookie(req, { name: 'auth', value: '', maxAge: 0 }),
+				handler: (req: Request) => new Redirect('/edify').setCookie(req, { name: 'auth', value: '', maxAge: 0 }),
 			},
 		],
 		middlewares: [

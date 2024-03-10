@@ -1,3 +1,5 @@
+import Meth from './meth.ts';
+
 export interface Field {
 	name?: string;
 	type: 'text' | 'number' | 'email' | 'password' | 'submit' | 'textarea' | 'select' | 'checkbox' | 'hidden';
@@ -85,7 +87,7 @@ function createInput(field: Field) {
 
 function createField(field: Field) {
 	return (
-		<div className="field-container">
+		<div className='field-container'>
 			{field.label && field.type != 'hidden' && createLabel(field)}
 			{createInput(field)}
 		</div>
@@ -213,14 +215,16 @@ export function SetDataToFields(fields: Field[], data: { [key: string]: string }
 	fields.forEach((field) => data && field.name && data[field.name] && (field.value = data[field.name]));
 }
 
-export function ObjectToFields(obj: Object) {
+export function ObjectToFields(obj: Record<string, object>): Field[] {
 	const fields: Field[] = [];
 	for (const key in obj) {
-		const val = obj.hasOwnProperty(key) && obj[key];
-		const typeMap = { string: 'text', number: 'number', boolean: 'checkbox' };
-		const type = typeMap[typeof val];
-		if (!type) continue;
-		fields.push({ name: key, type, value: val + '', label: key });
+		if (Meth.objHas(obj, key)) {
+			const val = obj[key];
+			const typeMap: Record<string, string> = { string: 'text', number: 'number', boolean: 'checkbox' };
+			const type = typeMap[typeof val];
+			if (!type) continue;
+			fields.push({ name: key, type, value: val + '', label: key } as Field);
+		}
 	}
 	return fields;
 }

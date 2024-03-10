@@ -1,9 +1,10 @@
-import { GetDataTypes } from './data-types.tsx';
+import { DataType, GetDataTypes } from './data-types.tsx';
 import EntriesTable from '../islands/EntriesTable.tsx';
 import Meth from './meth.ts';
 import { CreateForm, Field, SetDataToFields, ValidateFormData } from './auto-form.tsx';
 import { Redirect } from './web.ts';
 import db from './db.ts';
+import { Cell } from '../islands/Table.tsx';
 
 interface EditorLink {
 	title: string;
@@ -74,7 +75,7 @@ export default async function Editor(path: string[]) {
 			return [backLink, editorView, linkView];
 		},
 		getFields: () => fields as Field[],
-		setDataAndValidate: (data) => {
+		setDataAndValidate: (data: { [key: string]: string }) => {
 			SetDataToFields(fields as Field[], data);
 			ValidateFormData(data, fields as Field[]);
 		},
@@ -96,7 +97,7 @@ function RenderLinks(links?: EditorLink[]) {
 
 async function MakeEditorContent(path: string[], editor: EditorPage) {
 	const dataTypes = await GetDataTypes(db);
-	const dataType = dataTypes.get(editor.dataTypeID);
+	const dataType = dataTypes.get(editor.dataTypeID || '');
 
 	if (editor.view == 'dashboard') return [];
 	else if (editor.view == 'redirect') {
@@ -105,9 +106,9 @@ async function MakeEditorContent(path: string[], editor: EditorPage) {
 		if (!dataType) throw new Error('Data type not found');
 		const res = await db.get(path);
 		// if (res.versionstamp === null) throw new Error('Data does not exist');
-		const data = res.value ?? {};
 		const multipleFields = Array.isArray(dataType.fields);
-		let fields: Field[] = multipleFields ? dataType.fields : [dataType.fields];
+		let fields = (multipleFields ? dataType.fields : [dataType.fields]) as Field[];
+		const data = (res.value ?? {}) as { [key: string]: string };
 		if (!multipleFields && data !== null) {
 			if (fields.length) fields[0].value = Meth.string(data);
 		} else SetDataToFields(fields, data);
@@ -115,14 +116,18 @@ async function MakeEditorContent(path: string[], editor: EditorPage) {
 		return [CreateForm({ fields }), fields];
 	} else if (editor.view == 'table') {
 		if (!dataType) throw new Error('Data type not found');
-		const res = await Array.fromAsync(db.list({ prefix: path }));
-		const columns = ['key', ...dataType.fields.map((f) => f.name)];
+		const res = await Array.fromAsync(db.list({ prefix: path })) as { value: { [key: string]: string }; key: Deno.KvKey }[];
+		const multipleFields = Array.isArray(dataType.fields);
+		let fields = (multipleFields ? dataType.fields : [dataType.fields]) as Field[];
+		const columns = ['key', ...fields.map((f) => f.name)];
 		const rows = res.map((r, i) => {
 			return columns.map((col, j) => {
-				if (j == 0) return { value: r.key.at(-1), link: `/edify/edit/${path.join('/')}/${r.key.at(-1)}` };
-				return { value: res[i].value[col] };
+				if (j == 0) return { value: r.key.at(-1), link: `/edify/edit/${path.join('/')}/${r.key.at(-1)?.toString()}` };
+				if (!col) return { value: '' };
+				const value = res[i].value[col];
+				return { value };
 			});
 		});
-		return [<EntriesTable columns={columns} rows={rows} />];
+		return [<EntriesTable columns={columns as string[]} rows={rows as Cell[][]} />];
 	} else throw new Error('Invalid Editor view: ' + editor.view);
 }
