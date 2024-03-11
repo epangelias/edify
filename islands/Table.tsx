@@ -37,35 +37,37 @@ export default function EntriesTable(props: Props) {
 	}
 
 	return (
-		<table>
-			<thead>
-				<tr>
-					{props.columns.map((column) => (
-						<th
-							scope='col'
-							key={column}
-							onClick={() => handleSortChange(column)}
-							tabIndex={0}
-						>
-							{column}
-							{sortConfig.key === column && <span class='sort-icon'>{sortConfig.direction ? ' ▾' : ' ▴'}</span>}
-						</th>
-					))}
-				</tr>
-			</thead>
-			<tbody>
-				{props.rows.map((row, rowID) => (
+		<div className='table-container'>
+			<table>
+				<thead>
 					<tr>
-						{row.map((cell, id) => (
-							<td scope='col' key={id}>
-								{cell.link ? <a href={cell.link}>{cell.value}</a> : maxLen(cell.value, 100)}
-							</td>
+						{props.columns.map((column) => (
+							<th
+								scope='col'
+								key={column}
+								onClick={() => handleSortChange(column)}
+								tabIndex={0}
+							>
+								{column}
+								{sortConfig.key === column && <span class='sort-icon'>{sortConfig.direction ? ' ▾' : ' ▴'}</span>}
+							</th>
 						))}
-						{props.deleteCommand && <td tabIndex={0} onClick={() => props.deleteCommand(rowID)}>🗑️</td>}
 					</tr>
-				))}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{props.rows.map((row, rowID) => (
+						<tr>
+							{row.map((cell, id) => (
+								<td scope='col' key={id}>
+									{cell.link ? <a href={cell.link}>{cell.value}</a> : maxLen(cell.value, 100)}
+								</td>
+							))}
+							{props.deleteCommand && <td tabIndex={0} onClick={() => props.deleteCommand(rowID)}>🗑️</td>}
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
 	);
 }
 
