@@ -3,6 +3,7 @@ import AppView, { handler as appHandler } from './routes/edit.tsx';
 import LoginPage, { handler as loginHandler } from './routes/login.tsx';
 import middlewareHandler from './routes/middleware.tsx';
 import { Plugin } from '$fresh/server.ts';
+import db from './services/db.ts';
 
 export default function edifyPlugin(): Plugin {
 	const basePath = '/edify';
@@ -11,7 +12,7 @@ export default function edifyPlugin(): Plugin {
 		name: 'edify',
 		islands: {
 			baseLocation: import.meta.url,
-			paths: ['./islands/Table.tsx', './islands/EntriesTable.tsx'],
+			paths: ['./islands/Table.tsx', './islands/EntriesTable.tsx', './islands/AutoForm.tsx', './islands/Popup.tsx'],
 		},
 		routes: [
 			{
@@ -31,6 +32,13 @@ export default function edifyPlugin(): Plugin {
 			{
 				path: `${basePath}/logout`,
 				handler: (req: Request) => new Redirect('/edify').setCookie(req, { name: 'auth', value: '', maxAge: 0 }),
+			},
+			{
+				path: `${basePath}/api/delete/[...path]`,
+				handler: async (_req, ctx) => {
+					await db.delete(ctx.params.path.split('/'));
+					return new Response('Success');
+				},
 			},
 		],
 		middlewares: [

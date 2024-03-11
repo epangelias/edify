@@ -3,7 +3,6 @@ import { Page } from '../components/Page.tsx';
 import { UserData } from '../services/user.tsx';
 import { Redirect } from '../services/web.ts';
 import Editor from '../services/editor.tsx';
-import { CreateForm, GetFormData, SetDataToFields, ValidateFormData } from '../services/auto-form.tsx';
 import db from '../services/db.ts';
 
 interface CTX extends FreshContext {
@@ -20,18 +19,22 @@ export async function handler(req: Request, ctx: CTX) {
 
 	try {
 		const editor = await Editor(path);
-		const fields = editor.getFields();
-
 		if (req.method == 'POST') {
-			const formData = await GetFormData(req, fields);
-			editor.setDataAndValidate(formData);
-			const { ok } = await db.set(path, formData);
-			if (!ok) throw new Error('Error saving data');
+			try {
+				const data = await req.json();
+				editor.validate(data);
+				const { ok } = await db.set(path, data);
+				if (!ok) throw new Error('Error saving data');
+				return Response.json({ message: 'Saved' });
+			} catch (e) {
+				return Response.json({ error: e.message });
+			}
 		}
 
 		return ctx.render({
 			content: await editor.getContent(),
 			title,
+			plain: ctx.url.searchParams.get('plain'),
 		});
 	} catch (e) {
 		if (e instanceof Redirect) return e;
@@ -41,7 +44,7 @@ export async function handler(req: Request, ctx: CTX) {
 
 export default function AppView({ data }: PageProps) {
 	return (
-		<Page title={data.title}>
+		<Page title={data.title} plain={data.plain}>
 			{data.content}
 		</Page>
 	);

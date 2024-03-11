@@ -5,9 +5,10 @@ import { useSignal } from '@preact/signals';
 export interface Props {
 	columns: string[];
 	rows: Cell[][];
+	path: string[];
 }
 
-export default function EntriesTable({ rows, columns }: Props) {
+export default function EntriesTable({ rows, columns, path }: Props) {
 	const [searchTerm, setSearchTerm] = useState('');
 	const Rows = useSignal<Cell[][]>(rows);
 
@@ -24,6 +25,16 @@ export default function EntriesTable({ rows, columns }: Props) {
 		if (ID) window.location.href = window.location.href + '/' + ID;
 	}
 
+	function deleteCommand(rowID: number) {
+		const key = Rows.value[rowID][0].value;
+		if (!confirm(`Are you sure you want to delete ${key}?`)) return;
+		const keyPath = path.join('/') + '/' + key;
+		fetch('/edify/api/delete/' + keyPath);
+		const newRows = [...Rows.value];
+		newRows.splice(rowID, 1);
+		Rows.value = newRows;
+	}
+
 	return (
 		<div>
 			<div className='table-bar accent-bg'>
@@ -36,7 +47,7 @@ export default function EntriesTable({ rows, columns }: Props) {
 				/>
 				<button onClick={newCommand}>New</button>
 			</div>
-			<Table columns={columns} rows={filteredRows()} />
+			<Table columns={columns} rows={filteredRows()} deleteCommand={deleteCommand} />
 		</div>
 	);
 }

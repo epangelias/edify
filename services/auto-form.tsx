@@ -1,4 +1,5 @@
 import Meth from './meth.ts';
+import { AutoForm } from '../islands/AutoForm.tsx';
 
 export interface Field {
 	name?: string;
@@ -18,98 +19,6 @@ export interface Field {
 	rows?: number;
 	options?: [string, string][];
 	autoFocus?: boolean;
-}
-
-function createLabel(field: Field) {
-	const { name, label } = field;
-	return <label htmlFor={'field-' + name}>{label}</label>;
-}
-
-function createSelect(field: Field) {
-	return (
-		<select
-			name={field.name}
-			id={'field-' + field.name}
-			value={field.value}
-			required={field.required}
-			autoComplete={field.autocomplete || 'off'}
-			disabled={field.disabled}
-		>
-			{field.options?.map((option) => <option value={option[0]}>{option[1]}</option>)}
-		</select>
-	);
-}
-
-function createTextarea(field: Field) {
-	return (
-		<textarea
-			name={field.name}
-			id={'field-' + field.name}
-			placeholder={field.placeholder}
-			value={field.value}
-			required={field.required}
-			maxLength={field.maxLength}
-			minLength={field.minLength}
-			autoComplete={field.autocomplete || 'off'}
-			disabled={field.disabled}
-			cols={field.cols}
-			rows={field.rows}
-			autoFocus={field.autoFocus}
-		>
-		</textarea>
-	);
-}
-
-function createInput(field: Field) {
-	if (field.type == 'textarea') return createTextarea(field);
-	else if (field.type == 'select') return createSelect(field);
-	else if (field.type == 'submit' && !field.value) field.value = 'Submit';
-	return (
-		<input
-			type={field.type}
-			name={field.name}
-			id={'field-' + field.name}
-			placeholder={field.placeholder}
-			value={field.value}
-			required={field.required}
-			maxLength={field.maxLength}
-			minLength={field.minLength}
-			min={field.min}
-			max={field.max}
-			step={field.step}
-			autoComplete={field.autocomplete || 'off'}
-			disabled={field.disabled}
-			checked={field.type == 'checkbox' ? !!field.value : undefined}
-			autoFocus={field.autoFocus}
-		/>
-	);
-}
-
-function createField(field: Field) {
-	return (
-		<div className='field-container'>
-			{field.label && field.type != 'hidden' && createLabel(field)}
-			{createInput(field)}
-		</div>
-	);
-}
-
-interface formProps {
-	fields: Field[];
-	action?: string;
-	method?: 'POST' | 'GET';
-	error?: string;
-	message?: string;
-}
-
-export function CreateForm({ fields, action, method = 'POST', error, message }: formProps) {
-	return (
-		<>
-			<form action={action} method={method}>{fields.map(createField)}</form>
-			{error && <p class='error'>{error}</p>}
-			{message && <p class='updated'>{message}</p>}
-		</>
-	);
 }
 
 export async function GetFormData(req: Request, fields?: Field[]) {

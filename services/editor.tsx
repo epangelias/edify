@@ -5,6 +5,7 @@ import { CreateForm, Field, SetDataToFields, ValidateFormData } from './auto-for
 import { Redirect } from './web.ts';
 import db from './db.ts';
 import { Cell } from '../islands/Table.tsx';
+import { AutoForm } from '../islands/AutoForm.tsx';
 
 interface EditorLink {
 	title: string;
@@ -75,8 +76,7 @@ export default async function Editor(path: string[]) {
 			return [backLink, editorView, linkView];
 		},
 		getFields: () => fields as Field[],
-		setDataAndValidate: (data: { [key: string]: string }) => {
-			SetDataToFields(fields as Field[], data);
+		validate: (data: { [key: string]: string }) => {
 			ValidateFormData(data, fields as Field[]);
 		},
 	};
@@ -108,12 +108,12 @@ async function MakeEditorContent(path: string[], editor: EditorPage) {
 		// if (res.versionstamp === null) throw new Error('Data does not exist');
 		const multipleFields = Array.isArray(dataType.fields);
 		let fields = (multipleFields ? dataType.fields : [dataType.fields]) as Field[];
+		fields = structuredClone(fields);
 		const data = (res.value ?? {}) as { [key: string]: string };
 		if (!multipleFields && data !== null) {
 			if (fields.length) fields[0].value = Meth.string(data);
 		} else SetDataToFields(fields, data);
-		fields = [...fields, { type: 'submit', value: 'Save' }];
-		return [CreateForm({ fields }), fields];
+		return [<AutoForm fields={fields} />, fields];
 	} else if (editor.view == 'table') {
 		if (!dataType) throw new Error('Data type not found');
 		const res = await Array.fromAsync(db.list({ prefix: path })) as { value: { [key: string]: string }; key: Deno.KvKey }[];
@@ -122,12 +122,12 @@ async function MakeEditorContent(path: string[], editor: EditorPage) {
 		const columns = ['key', ...fields.map((f) => f.name)];
 		const rows = res.map((r, i) => {
 			return columns.map((col, j) => {
-				if (j == 0) return { value: r.key.at(-1), link: `/edify/edit/${path.join('/')}/${r.key.at(-1)?.toString()}` };
+				if (j == 0) return { value: r.key.at(-1), link: `#edit:${path.join('/')}/${r.key.at(-1)?.toString()}?plain=1` };
 				if (!col) return { value: '' };
 				const value = res[i].value[col];
 				return { value };
 			});
 		});
-		return [<EntriesTable columns={columns as string[]} rows={rows as Cell[][]} />];
+		return [<EntriesTable path={path} columns={columns as string[]} rows={rows as Cell[][]} />];
 	} else throw new Error('Invalid Editor view: ' + editor.view);
 }
