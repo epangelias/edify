@@ -122,7 +122,7 @@ async function MakeEditorContent(path: string[], editor: EditorPage) {
 		const columns = ['key', ...fields.map((f) => f.name)];
 		const rows = res.map((r, i) => {
 			return columns.map((col, j) => {
-				if (j == 0) return { value: r.key.at(-1), link: `#edit:${path.join('/')}/${r.key.at(-1)?.toString()}?plain=1` };
+				if (j == 0) return { value: r.key.at(-1), link: `/edify/edit/${path.join('/')}/${r.key.at(-1)?.toString()}` };
 				if (!col) return { value: '' };
 				const value = res[i].value[col];
 				return { value };

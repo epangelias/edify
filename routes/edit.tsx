@@ -34,7 +34,6 @@ export async function handler(req: Request, ctx: CTX) {
 		return ctx.render({
 			content: await editor.getContent(),
 			title,
-			plain: ctx.url.searchParams.get('plain'),
 		});
 	} catch (e) {
 		if (e instanceof Redirect) return e;
@@ -44,7 +43,7 @@ export async function handler(req: Request, ctx: CTX) {
 
 export default function AppView({ data }: PageProps) {
 	return (
-		<Page title={data.title} plain={data.plain}>
+		<Page title={data.title}>
 			{data.content}
 		</Page>
 	);

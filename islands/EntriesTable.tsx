@@ -22,7 +22,7 @@ export default function EntriesTable({ rows, columns, path }: Props) {
 
 	function newCommand() {
 		const ID = prompt('Enter ID');
-		if (ID) window.location.href = window.location.href + '/' + ID;
+		if (ID) window.location.hash = 'edit:' + path.join('/') + '/' + ID;
 	}
 
 	function deleteCommand(rowID: number) {
