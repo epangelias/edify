@@ -22,7 +22,7 @@ export default function EntriesTable({ rows, columns, path }: Props) {
 
 	function newCommand() {
 		const ID = prompt('Enter ID');
-		if (ID) window.location.hash = 'edit:' + path.join('/') + '/' + ID;
+		if (ID) window.location.href = '/edify/edit/' + path.join('/') + '/' + ID;
 	}
 
 	function deleteCommand(rowID: number) {
