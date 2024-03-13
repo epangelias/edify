@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import Table, { Cell } from './Table.tsx';
 import { useSignal } from '@preact/signals';
+import { join } from '$std/path/join.ts';
 
 export interface Props {
 	columns: string[];
@@ -26,6 +27,7 @@ export default function EntriesTable({ rows, columns, path }: Props) {
 	}
 
 	function deleteCommand(rowID: number) {
+		if (searchTerm) return alert('Cannot delete with active filter');
 		const key = Rows.value[rowID][0].value;
 		if (!confirm(`Are you sure you want to delete ${key}?`)) return;
 		const keyPath = path.join('/') + '/' + key;
