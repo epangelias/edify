@@ -46,6 +46,7 @@ export default function EntriesTable({ rows, columns, path }: Props) {
 					placeholder='Search...'
 					value={searchTerm}
 					onInput={(e) => handleSearchChange(e.currentTarget.value)}
+					autoFocus
 				/>
 				<button onClick={newCommand}>New</button>
 			</div>

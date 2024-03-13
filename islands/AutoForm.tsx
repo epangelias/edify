@@ -23,6 +23,13 @@ function createSelect(field: Field) {
 }
 
 function createTextarea(field: Field) {
+	// Set textarea height to its content
+	function setHeight(e: Event) {
+		const target = e.target as HTMLTextAreaElement;
+		target.style.height = 'auto';
+		target.style.height = target.scrollHeight + 16 + 'px';
+	}
+
 	return (
 		<textarea
 			name={field.name}
@@ -37,6 +44,8 @@ function createTextarea(field: Field) {
 			cols={field.cols}
 			rows={field.rows}
 			autoFocus={field.autoFocus}
+			onFocus={setHeight}
+			onInput={setHeight}
 		>
 		</textarea>
 	);
