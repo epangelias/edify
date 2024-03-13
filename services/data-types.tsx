@@ -53,4 +53,31 @@ const DefaultDataTypes: { [key: string]: DataType } = {
 			},
 		],
 	},
+	submission: {
+		name: 'Form Submission',
+		fields: [
+			{
+				label: 'Date',
+				name: 'date',
+				type: 'date',
+				required: true,
+			},
+			{
+				label: 'Name',
+				name: 'name',
+				type: 'text',
+			},
+			{
+				label: 'Email',
+				name: 'email',
+				type: 'email',
+			},
+			{
+				label: 'Message',
+				name: 'message',
+				type: 'textarea',
+				required: true,
+			},
+		],
+	},
 };

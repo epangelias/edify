@@ -27,6 +27,7 @@ const editors: EditorPage[] = [
 		links: [
 			{ title: 'Software Docs', path: 'docs/software' },
 			{ title: 'Help Docs', path: 'docs/help' },
+			{ title: 'Form Submissions', path: 'submissions' },
 		],
 	},
 	{
@@ -53,6 +54,16 @@ const editors: EditorPage[] = [
 		path: 'docs/help/*',
 		view: 'edit',
 		dataTypeID: 'doc',
+	},
+	{
+		path: 'submissions',
+		view: 'table',
+		dataTypeID: 'submission',
+	},
+	{
+		path: 'submissions/*',
+		view: 'edit',
+		dataTypeID: 'submission',
 	},
 ];
 
