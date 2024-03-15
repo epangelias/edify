@@ -1,11 +1,20 @@
 import { Redirect } from './services/web.ts';
 import AppView, { handler as appHandler } from './routes/edit.tsx';
 import LoginPage, { handler as loginHandler } from './routes/login.tsx';
-import middlewareHandler from './routes/middleware.tsx';
-import { Plugin } from '$fresh/server.ts';
+import { FreshContext, Plugin } from '$fresh/server.ts';
 import db from './services/db.ts';
+import type { DataType } from './services/data-types.tsx';
+import type { EditorPage } from './services/editor.tsx';
+import { getUserByAuth } from './services/user.tsx';
+import { GetCookies } from './services/web.ts';
 
-export default function edifyPlugin(): Plugin {
+interface edifyConfig {
+	dataTypes: DataType[];
+	editorPages: EditorPage[];
+	basePath: string;
+}
+
+export default function edifyPlugin(edifyConfig: edifyConfig): Plugin {
 	const basePath = '/edify';
 
 	return {
@@ -35,7 +44,7 @@ export default function edifyPlugin(): Plugin {
 			},
 			{
 				path: `${basePath}/api/delete/[...path]`,
-				handler: async (_req, ctx) => {
+				handler: async (_req: Request, ctx: FreshContext) => {
 					await db.delete(ctx.params.path.split('/'));
 					return new Response('Success');
 				},
@@ -44,7 +53,14 @@ export default function edifyPlugin(): Plugin {
 		middlewares: [
 			{
 				path: `${basePath}`,
-				middleware: { handler: middlewareHandler },
+				middleware: {
+					handler: async (req: Request, ctx: FreshContext) => {
+						ctx.state.userData = await getUserByAuth(GetCookies(req.headers).auth);
+						ctx.state.path = ctx.params?.path?.split('/');
+						ctx.state.edifyConfig = edifyConfig;
+						return ctx.next();
+					},
+				},
 			},
 		],
 	};

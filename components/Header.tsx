@@ -2,12 +2,12 @@ export function Header() {
 	return (
 		<header>
 			<div className='left'>
-				<a href='/'>Edify</a>
+				<a href='/'>◂ Back To Home</a>
 			</div>
 			<div className='right'>
 				<a href='/edify/login'>
 					Login
-				</a>
+				</a>&nbsp;
 				<a href='/edify/logout'>
 					Logout
 				</a>

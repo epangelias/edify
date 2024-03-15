@@ -26,6 +26,8 @@ function createTextarea(field: Field) {
 	// Set textarea height to its content
 	function setHeight(e: Event) {
 		const target = e.target as HTMLTextAreaElement;
+		// alert(target.offsetHeight + ', ' + target.scrollHeight);
+		if (target.offsetHeight > target.scrollHeight) return;
 		target.style.height = 'auto';
 		target.style.height = target.scrollHeight + 16 + 'px';
 	}

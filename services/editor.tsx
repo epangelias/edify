@@ -12,7 +12,7 @@ interface EditorLink {
 	path: string;
 }
 
-interface EditorPage {
+export interface EditorPage {
 	path: string;
 	view: 'edit' | 'table' | 'dashboard' | 'redirect';
 	dataTypeID?: string;

@@ -48,7 +48,6 @@ const DefaultDataTypes: { [key: string]: DataType } = {
 				name: 'content',
 				type: 'textarea',
 				required: true,
-				cols: 60,
 				rows: 10,
 			},
 		],
