@@ -11,19 +11,7 @@ export async function GetDataTypes(db: Deno.Kv) {
 	return Meth.objectToMap(DefaultDataTypes) as Map<string, DataType>;
 }
 
-const defaultData = JSON.stringify({ name: 'New Data Type', fields: [{ name: 'name', type: 'text', label: 'Name', required: true }] }, null, 2);
-
 const DefaultDataTypes: { [key: string]: DataType } = {
-	type: {
-		name: 'Data Type',
-		fields: {
-			name: 'data',
-			type: 'textarea',
-			cols: 60,
-			rows: 10,
-			value: defaultData,
-		},
-	},
 	doc: {
 		name: 'Doc',
 		fields: [

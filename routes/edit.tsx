@@ -4,21 +4,23 @@ import { UserData } from '../services/user.tsx';
 import { Redirect } from '../services/web.ts';
 import Editor from '../services/editor.tsx';
 import db from '../services/db.ts';
+import { EdifyConfig } from '../mod.ts';
 
 interface CTX extends FreshContext {
 	state: {
 		path: string[];
 		userData: UserData;
+		edifyConfig: EdifyConfig;
 	};
 }
 
 export async function handler(req: Request, ctx: CTX) {
-	const { path, userData } = ctx.state;
+	const { path, userData, edifyConfig } = ctx.state;
 	if (!userData) return new Redirect('/edify/login');
 	const title = path.join(' ▸ ') || 'Dashboard';
 
 	try {
-		const editor = await Editor(path);
+		const editor = await Editor(path, edifyConfig);
 		if (req.method == 'POST') {
 			try {
 				const data = await req.json();

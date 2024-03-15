@@ -6,6 +6,7 @@ import { Redirect } from './web.ts';
 import db from './db.ts';
 import { Cell } from '../islands/Table.tsx';
 import { AutoForm } from '../islands/AutoForm.tsx';
+import { EdifyConfig } from '../mod.ts';
 
 interface EditorLink {
 	title: string;
@@ -20,70 +21,25 @@ export interface EditorPage {
 	redirect?: string;
 }
 
-const editors: EditorPage[] = [
-	{
-		path: '',
-		view: 'dashboard',
-		links: [
-			{ title: 'Software Docs', path: 'docs/software' },
-			{ title: 'Help Docs', path: 'docs/help' },
-			{ title: 'Form Submissions', path: 'submissions' },
-		],
-	},
-	{
-		path: 'docs',
-		view: 'redirect',
-		redirect: '/edify/edit',
-	},
-	{
-		path: 'docs/software',
-		view: 'table',
-		dataTypeID: 'doc',
-	},
-	{
-		path: 'docs/software/*',
-		view: 'edit',
-		dataTypeID: 'doc',
-	},
-	{
-		path: 'docs/help',
-		view: 'table',
-		dataTypeID: 'doc',
-	},
-	{
-		path: 'docs/help/*',
-		view: 'edit',
-		dataTypeID: 'doc',
-	},
-	{
-		path: 'submissions',
-		view: 'table',
-		dataTypeID: 'submission',
-	},
-	{
-		path: 'submissions/*',
-		view: 'edit',
-		dataTypeID: 'submission',
-	},
-];
-
 function pathMatches(path: string[], path2: string) {
 	if (path2 == path.join('/')) return true;
 	if (path2 == path.slice(0, -1).join('/') + '/*') return true;
 	return false;
 }
 
-export default async function Editor(path: string[]) {
-	const editor = editors.find((e) => pathMatches(path, e.path));
+export default async function Editor(path: string[], {editorPages, dataTypes}: EdifyConfig) {
+	const editor = editorPages.find((e) => pathMatches(path, e.path));
 	if (!editor) throw new Error('Editor page not found');
+	
+	const dataType = dataTypes[editor.dataTypeID];
 
-	let [editorView, fields] = await MakeEditorContent(path, editor);
+	let [editorView, fields] = await MakeEditorContent(path, editor, dataType);
 	const linkView = RenderLinks(editor.links);
 	const backLink = path[0] ? <a href={'/edify/edit/' + path.slice(0, -1).join('/')}>Back</a> : '';
 
 	return {
 		getContent: async () => {
-			[editorView] = await MakeEditorContent(path, editor);
+			[editorView] = await MakeEditorContent(path, editor, dataType);
 			return [backLink, editorView, linkView];
 		},
 		getFields: () => fields as Field[],
@@ -106,10 +62,7 @@ function RenderLinks(links?: EditorLink[]) {
 	);
 }
 
-async function MakeEditorContent(path: string[], editor: EditorPage) {
-	const dataTypes = await GetDataTypes(db);
-	const dataType = dataTypes.get(editor.dataTypeID || '');
-
+async function MakeEditorContent(path: string[], editor: EditorPage, dataType) {
 	if (editor.view == 'dashboard') return [];
 	else if (editor.view == 'redirect') {
 		throw new Redirect(editor.redirect || '');

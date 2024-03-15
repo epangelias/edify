@@ -8,14 +8,17 @@ import type { EditorPage } from './services/editor.tsx';
 import { getUserByAuth } from './services/user.tsx';
 import { GetCookies } from './services/web.ts';
 
-interface edifyConfig {
-	dataTypes: DataType[];
+export interface EdifyConfig {
+	dataTypes: Record<string, DataType>;
 	editorPages: EditorPage[];
-	basePath: string;
+	basePath?: string;
 }
 
-export default function edifyPlugin(edifyConfig: edifyConfig): Plugin {
-	const basePath = '/edify';
+export default function edifyPlugin(edifyConfig: EdifyConfig): Plugin {
+	edifyConfig = {
+		basePath: '/edify',
+		...edifyConfig,
+	};
 
 	return {
 		name: 'edify',
@@ -25,25 +28,25 @@ export default function edifyPlugin(edifyConfig: edifyConfig): Plugin {
 		},
 		routes: [
 			{
-				path: `${basePath}`,
-				handler: () => new Redirect(`${basePath}/edit`),
+				path: `${edifyConfig.basePath}`,
+				handler: () => new Redirect(`${edifyConfig.basePath}/edit`),
 			},
 			{
-				path: `${basePath}/edit/[...path]`,
+				path: `${edifyConfig.basePath}/edit/[...path]`,
 				handler: appHandler,
 				component: AppView,
 			},
 			{
-				path: `${basePath}/login`,
+				path: `${edifyConfig.basePath}/login`,
 				handler: loginHandler,
 				component: LoginPage,
 			},
 			{
-				path: `${basePath}/logout`,
+				path: `${edifyConfig.basePath}/logout`,
 				handler: (req: Request) => new Redirect('/edify').setCookie(req, { name: 'auth', value: '', maxAge: 0 }),
 			},
 			{
-				path: `${basePath}/api/delete/[...path]`,
+				path: `${edifyConfig.basePath}/api/delete/[...path]`,
 				handler: async (_req: Request, ctx: FreshContext) => {
 					await db.delete(ctx.params.path.split('/'));
 					return new Response('Success');
@@ -52,7 +55,7 @@ export default function edifyPlugin(edifyConfig: edifyConfig): Plugin {
 		],
 		middlewares: [
 			{
-				path: `${basePath}`,
+				path: `${edifyConfig.basePath}`,
 				middleware: {
 					handler: async (req: Request, ctx: FreshContext) => {
 						ctx.state.userData = await getUserByAuth(GetCookies(req.headers).auth);
