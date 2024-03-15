@@ -24,7 +24,7 @@ export default function edifyPlugin(edifyConfig: EdifyConfig): Plugin {
 		name: 'edify',
 		islands: {
 			baseLocation: import.meta.url,
-			paths: ['./islands/Table.tsx', './islands/EntriesTable.tsx', './islands/AutoForm.tsx'],
+			paths: ['./islands/Table.tsx', './islands/EntriesTable.tsx', './islands/AutoForm.tsx', './islands/Popup.tsx'],
 		},
 		routes: [
 			{

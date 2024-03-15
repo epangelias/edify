@@ -2,6 +2,7 @@ import { useState } from 'preact/hooks';
 import Table, { Cell } from './Table.tsx';
 import { useSignal } from '@preact/signals';
 import { join } from '$std/path/join.ts';
+import { Popup } from './Popup.tsx';
 
 export interface Props {
 	columns: string[];
@@ -23,7 +24,7 @@ export default function EntriesTable({ rows, columns, path }: Props) {
 
 	function newCommand() {
 		const ID = prompt('Enter ID');
-		if (ID) window.location.href = '/edify/edit/' + path.join('/') + '/' + ID;
+		if (ID) window.location.href = '##' + ID;
 	}
 
 	function deleteCommand(rowID: number) {

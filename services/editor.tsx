@@ -7,6 +7,7 @@ import db from './db.ts';
 import { Cell } from '../islands/Table.tsx';
 import { AutoForm } from '../islands/AutoForm.tsx';
 import { EdifyConfig } from '../mod.ts';
+import { Popup } from '../islands/Popup.tsx';
 
 interface EditorLink {
 	title: string;
@@ -82,16 +83,18 @@ async function MakeEditorContent(path: string[], editor: EditorPage, dataType) {
 		if (!dataType) throw new Error('Data type not found');
 		const res = await Array.fromAsync(db.list({ prefix: path })) as { value: { [key: string]: string }; key: Deno.KvKey }[];
 		const multipleFields = Array.isArray(dataType.fields);
-		let fields = (multipleFields ? dataType.fields : [dataType.fields]) as Field[];
+		const fields = (multipleFields ? dataType.fields : [dataType.fields]) as Field[];
 		const columns = ['key', ...fields.map((f) => f.name)];
 		const rows = res.map((r, i) => {
 			return columns.map((col, j) => {
-				if (j == 0) return { value: r.key.at(-1), link: `/edify/edit/${path.join('/')}/${r.key.at(-1)?.toString()}` };
+				// const link = `/edify/edit/${path.join('/')}/${r.key.at(-1)?.toString()}`
+				const link = `##${r.key.at(-1)?.toString()}`
+				if (j == 0) return { value: r.key.at(-1), link };
 				if (!col) return { value: '' };
 				const value = res[i].value[col];
 				return { value };
 			});
 		});
-		return [<EntriesTable path={path} columns={columns as string[]} rows={rows as Cell[][]} />];
+		return [<><EntriesTable path={path} columns={columns as string[]} rows={rows as Cell[][]} /><Popup values={res} fields={fields}/></>];
 	} else throw new Error('Invalid Editor view: ' + editor.view);
 }
