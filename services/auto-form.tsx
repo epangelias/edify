@@ -1,9 +1,8 @@
 import Meth from './meth.ts';
-import { AutoForm } from '../islands/AutoForm.tsx';
 
 export interface Field {
 	name?: string;
-	type: 'text' | 'number' | 'email' | 'password' | 'submit' | 'textarea' | 'select' | 'checkbox' | 'hidden';
+	type: 'text' | 'number' | 'email' | 'password' | 'submit' | 'textarea' | 'select' | 'checkbox' | 'hidden' | 'date';
 	placeholder?: string;
 	label?: string;
 	value?: string;
@@ -21,18 +20,37 @@ export interface Field {
 	autoFocus?: boolean;
 }
 
-export async function GetFormData(req: Request, fields?: Field[]) {
-	const form = await req.formData();
-
-	const result: { [key: string]: string } = {};
-
-	if (fields) {
-		fields.forEach((field) => field.name && field.value && (result[field.name] = field.value));
+async function castFieldValue(value: string, field: Field){
+	switch (field.type){
+		case 'number':
+			return Number(value);
+		case 'checkbox':
+			return value == 'on';
+		case 'date':
+			return new Date(value);
+		case 'password': 
+			return await Meth.hashPassword(value);
+		default:
+			return value;
 	}
+}
 
+export async function ExtractFormData(obj: Record<string, unknown>,  fields: Field[]){
+	const data = new Map(Object.entries(obj));
+	const result = {};
+	for (const field of fields){
+		result[field.name] = await castFieldValue(data.get(field.name) as string, field);
+	}
+	return result;
+}
+
+export async function GetFormData(a: Request | FormData, fields?: Field[]) {
+	const form = a instanceof FormData ? a : await a.formData();
+	const result: { [key: string]: unknown } = {};
 	for (const [key, value] of form.entries()) {
 		result[key] = value.toString();
 	}
+	if(fields)return ExtractFormData(result, fields);
 	return result;
 }
 
@@ -43,7 +61,7 @@ interface validationCondition {
 
 const validationConditions: validationCondition[] = [
 	{
-		condition: (field, value) => !value && field.type != 'checkbox',
+		condition: (field, value) => !value && field.type != 'checkbox' && !field.disabled,
 		message: (field) => `${field.label || field.name} is required`,
 	},
 	{
@@ -82,7 +100,7 @@ const validationConditions: validationCondition[] = [
 	{
 		condition: (field, value) =>
 			field.type === 'email' &&
-			!value.match(/^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/),
+			!value.includes('@'),
 		message: (field) => `${field.label || field.name} is not a valid email`,
 	},
 ];

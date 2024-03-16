@@ -1,8 +1,6 @@
 import { useState } from 'preact/hooks';
 import Table, { Cell } from './Table.tsx';
 import { useSignal } from '@preact/signals';
-import { join } from '$std/path/join.ts';
-import { Popup } from './Popup.tsx';
 
 export interface Props {
 	columns: string[];

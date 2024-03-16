@@ -5,16 +5,15 @@ import { Redirect } from '../services/web.ts';
 import Editor from '../services/editor.tsx';
 import db from '../services/db.ts';
 import { EdifyConfig } from '../mod.ts';
+import { ExtractFormData } from '../services/auto-form.tsx';
 
-interface CTX extends FreshContext {
-	state: {
+interface state  {
 		path: string[];
 		userData: UserData;
 		edifyConfig: EdifyConfig;
-	};
 }
 
-export async function handler(req: Request, ctx: CTX) {
+export async function handler(req: Request, ctx: FreshContext<state>) {
 	const { path, userData, edifyConfig } = ctx.state;
 	if (!userData) return new Redirect('/edify/login');
 	const title = path.join(' ▸ ') || 'Dashboard';

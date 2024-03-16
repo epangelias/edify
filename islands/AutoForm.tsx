@@ -1,6 +1,10 @@
-import { useRef, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import { Field } from '../services/auto-form.tsx';
 import { useSignal } from '@preact/signals';
+import Meth from '../services/meth.ts';
+import { ExtractFormData } from '../services/auto-form.tsx';
+import { GetFormDataAndValidate } from '../services/auto-form.tsx';
+import { GetFormData } from '../services/auto-form.tsx';
 
 function createLabel(field: Field) {
 	const { name, label } = field;
@@ -24,16 +28,22 @@ function createSelect(field: Field) {
 
 function createTextarea(field: Field) {
 	// Set textarea height to its content
-	function setHeight(e: Event) {
-		const target = e.target as HTMLTextAreaElement;
-		// alert(target.offsetHeight + ', ' + target.scrollHeight);
-		if (target.offsetHeight > target.scrollHeight) return;
-		target.style.height = 'auto';
-		target.style.height = target.scrollHeight + 16 + 'px';
+	function setHeight(noShrink:Event|false=false) {
+		if(!ref.current)return;
+		if (ref.current.offsetHeight > ref.current.scrollHeight && noShrink) return;
+		ref.current.style.height = 'auto';
+		ref.current.style.height = Math.max(ref.current.scrollHeight, 24) + 4 + 'px';
 	}
+
+	const ref = useRef<HTMLTextAreaElement>(null);
+
+	useEffect(() => {
+		setHeight();
+	}, [field.value]);
 
 	return (
 		<textarea
+			ref={ref}
 			name={field.name}
 			id={'field-' + field.name}
 			placeholder={field.placeholder}
@@ -46,7 +56,6 @@ function createTextarea(field: Field) {
 			cols={field.cols}
 			rows={field.rows}
 			autoFocus={field.autoFocus}
-			onFocus={setHeight}
 			onInput={setHeight}
 		>
 		</textarea>
@@ -85,16 +94,6 @@ export function createField(field: Field) {
 			{createInput(field)}
 		</div>
 	);
-}
-
-export function GetFormData(formData: FormData) {
-	const result: { [key: string]: string } = {};
-
-	for (const [key, value] of formData.entries()) {
-		result[key] = value.toString();
-	}
-
-	return result;
 }
 
 interface CookieOptions {
@@ -137,11 +136,14 @@ export function AutoForm({ fields, action }: formProps) {
 
 			const formData = new FormData(form.current);
 
+			const body = JSON.stringify(await GetFormData(formData, fields))
+
 			const res = await fetch(action || '', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(GetFormData(formData)),
+				body,
 			});
+			
 
 			if (!res.ok) {
 				throw new Error(`Request failed with status ${res.status}`);
@@ -166,11 +168,14 @@ export function AutoForm({ fields, action }: formProps) {
 		if (btn.current) btn.current.disabled = false;
 	}
 
+
+	const hasEnabledField = fields.some(field => !field.disabled);
+
 	return (
 		<>
 			<form onSubmit={submit} ref={form}>
 				{fields.map(createField)}
-				<button ref={btn}>Submit</button>
+				{hasEnabledField && <button ref={btn}>Submit</button>}
 			</form>
 			{err && <p class='form-error'>{err}</p>}
 			{msg && <p class='form-message'>{msg}</p>}

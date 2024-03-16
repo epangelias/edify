@@ -3,7 +3,7 @@ import { AutoForm } from './AutoForm.tsx';
 import {Field, SetDataToFields} from "../services/auto-form.tsx";
 import { useSignal } from '@preact/signals';
 
-export function Popup({fields: _fields, values}: {fields: Field[], values: Deno.KvEntry<Record<string, unknown>>[]}) {
+export function Popup({fields: _fields, values, path}: {fields: Field[], values: Deno.KvEntry<Record<string, unknown>>[], path: string[]}) {
 	const fields = useSignal(_fields);
 	const [action, setAction] = useState("");
 	const dialog = useRef<HTMLDialogElement>(null);
@@ -14,9 +14,10 @@ export function Popup({fields: _fields, values}: {fields: Field[], values: Deno.
 		const ID = document.location.hash.split("##")[1];
 		if(!ID)return;
 		const value = values.find(val => val.key.at(-1) == ID);
-		if(!value)return alert("Entry does not exist of ID " +ID);
-		SetDataToFields(fields.value, value.value);
-		setAction("/edify/edit/" + value.key.join("/"));
+		// if(!value)return alert("Entry does not exist of ID " +ID);
+		if(value)SetDataToFields(fields.value, value.value);
+		else fields.value.forEach(field => field.value = "");
+		setAction("/edify/edit/" + path.join("/") + "/" + ID);
 		fields.value = [...fields.value];
 		modal.showModal();
 	}
