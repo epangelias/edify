@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { AutoForm } from './AutoForm.tsx';
 import {Field, SetDataToFields} from "../services/auto-form.tsx";
-import { useSignal } from '@preact/signals';
+import { Signal, useSignal } from '@preact/signals';
 
-export function Popup({fields: _fields, values, path}: {fields: Field[], values: Deno.KvEntry<Record<string, unknown>>[], path: string[]}) {
+export function Popup({fields: _fields, Values, path}: {fields: Field[], Values: Signal<Deno.KvEntry<Record<string, unknown>>[]>, path: string[]}) {
 	const fields = useSignal(_fields);
 	const [action, setAction] = useState("");
 	const dialog = useRef<HTMLDialogElement>(null);
@@ -13,7 +13,7 @@ export function Popup({fields: _fields, values, path}: {fields: Field[], values:
 		if (!modal) return;
 		const ID = document.location.hash.split("##")[1];
 		if(!ID)return;
-		const value = values.find(val => val.key.at(-1) == ID);
+		const value = Values.value.find(val => val.key.at(-1) == ID);
 		// if(!value)return alert("Entry does not exist of ID " +ID);
 		if(value)SetDataToFields(fields.value, value.value);
 		else fields.value.forEach(field => field.value = "");
@@ -48,9 +48,19 @@ export function Popup({fields: _fields, values, path}: {fields: Field[], values:
 		window.history.pushState({}, '', window.location.href.split('#')[0]);
 	}
 
+	function onSubmit(data: Record<string, unknown>){
+		const ID = document.location.hash.split("##")[1];
+		if(!ID)return;
+		const res = Values.value.find(val => val.key.at(-1) == ID);
+		if(!res)return;
+		res.value = data;
+		Values.value = [...Values.value];
+		dialog.current?.close();
+	}
+
 	return (
 		<dialog ref={dialog} onClick={dialogClickHandler} onClose={dialogClose}>
-			<AutoForm fields={fields.value} action={action} />
+			<AutoForm fields={fields.value} action={action} onSubmit={onSubmit} />
 
 			<form method='dialog'>
 				<button>Close</button>

@@ -1,16 +1,43 @@
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import Table, { Cell } from './Table.tsx';
 import { useSignal } from '@preact/signals';
+import { Popup } from './Popup.tsx';
 
 export interface Props {
 	columns: string[];
 	rows: Cell[][];
 	path: string[];
+	fields: Field[];
+	values: Deno.KvEntry<Record<string, unknown>>[];
 }
 
-export default function EntriesTable({ rows, columns, path }: Props) {
+export default function EntriesTable({ path, values, fields }: Props) {
+	const columns = ['key', ...fields.map(f => f.name)];
+
+	const Values = useSignal(values);
+
+	function getRows(){
+		return Values.value.map((r, i) => {
+			return columns.map((col, j) => {
+				const link = `##${r.key.at(-1)?.toString()}`
+				if (j == 0) return { value: r.key.at(-1), link };
+				if (!col) return { value: '' };
+				let value = Values.value[i].value[col];
+				if(typeof value == "boolean")value = value ? "✔️" : "❌";
+				return { value };
+			});
+		})
+	}
+
+	const rows = getRows();
+
 	const [searchTerm, setSearchTerm] = useState('');
-	const Rows = useSignal<Cell[][]>(rows);
+	const Rows = useSignal<Cell[][]>(rows as Cell[][]);
+
+
+	useEffect(() => {
+		Rows.value = getRows() as Cell[][];
+	}, [Values.value]);
 
 	function handleSearchChange(value: string) {
 		setSearchTerm(value);
@@ -50,6 +77,7 @@ export default function EntriesTable({ rows, columns, path }: Props) {
 				<button onClick={newCommand}>New</button>
 			</div>
 			<Table columns={columns} rows={filteredRows()} deleteCommand={deleteCommand} />
+			<Popup path={path} Values={Values} fields={fields} />
 		</div>
 	);
 }

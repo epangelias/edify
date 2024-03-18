@@ -25,7 +25,7 @@ async function castFieldValue(value: string, field: Field){
 		case 'number':
 			return Number(value);
 		case 'checkbox':
-			return !!value;
+			return value !== undefined;
 		case 'date':
 			return new Date(value);
 		case 'password': 

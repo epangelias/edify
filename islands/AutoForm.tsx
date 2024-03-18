@@ -117,17 +117,25 @@ function setCookie({ name, value, days }: CookieOptions) {
 interface formProps {
 	fields: Field[];
 	action?: string;
+	onSubmit?: (data: Record<string, unknown>) => void;
 }
 
-export function AutoForm({ fields, action }: formProps) {
+export function AutoForm({ fields, action, onSubmit }: formProps) {
 	const msg = useSignal('');
 	const err = useSignal('');
 	const btn = useRef<HTMLButtonElement>(null);
 	const form = useRef<HTMLFormElement>(null);
+	
+	useEffect(() => {
+		err.value = '';
+		msg.value = '';
+	}, [fields]);
 
 	async function submit(e: Event) {
 		e.preventDefault();
+
 		if (btn.current) btn.current.disabled = true;
+		
 		err.value = '';
 		msg.value = '';
 
@@ -136,13 +144,12 @@ export function AutoForm({ fields, action }: formProps) {
 
 			const formData = new FormData(form.current);
 
-			
-			const body = JSON.stringify(await GetFormData(formData, fields))
-			
+			const data = await GetFormData(formData, fields);
+
 			const res = await fetch(action || '', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body,
+				body: JSON.stringify(data),
 			});
 			
 
@@ -161,6 +168,8 @@ export function AutoForm({ fields, action }: formProps) {
 			if (result.redirect) window.location.href = result.redirect;
 
 			msg.value = result.message || 'Submitted';
+
+			if(onSubmit) onSubmit(data);
 		} catch (e) {
 			console.error('Error submitting form:', e);
 			err.value = e.message;
