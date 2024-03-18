@@ -25,7 +25,7 @@ async function castFieldValue(value: string, field: Field){
 		case 'number':
 			return Number(value);
 		case 'checkbox':
-			return value == 'on';
+			return !!value;
 		case 'date':
 			return new Date(value);
 		case 'password': 
@@ -139,7 +139,7 @@ export async function GetFormDataAndValidate(req: Request, fields: Field[]) {
 }
 
 export function SetDataToFields(fields: Field[], data: { [key: string]: string }) {
-	fields.forEach((field) => data && field.name && data[field.name] && (field.value = data[field.name]));
+	fields.forEach((field) => field.value = data[field.name] || '');
 }
 
 export function ObjectToFields(obj: Record<string, object>): Field[] {

@@ -136,8 +136,9 @@ export function AutoForm({ fields, action }: formProps) {
 
 			const formData = new FormData(form.current);
 
+			
 			const body = JSON.stringify(await GetFormData(formData, fields))
-
+			
 			const res = await fetch(action || '', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
