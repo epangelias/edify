@@ -66,7 +66,7 @@ export function Popup({fields: _fields, Values, path}: {fields: Field[], Values:
 	}
 
 	return (
-		<dialog ref={dialog} onClick={dialogClickHandler} onClose={dialogClose}>
+		<dialog ref={dialog} onMouseDown={dialogClickHandler} onClose={dialogClose}>
 			<AutoForm fields={fields.value} action={action} onSubmit={onSubmit} />
 
 			<form method='dialog'>
