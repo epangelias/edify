@@ -52,6 +52,18 @@ const Meth = {
 		const hashArray = Array.from(new Uint8Array(hashBuffer));
 		const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
 		return hashHex;
-	}
+	},
+	stringToDate(dateString: string | Date) {
+		if(dateString instanceof Date)return dateString;
+		const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+		if (regex.test(dateString)) return new Date(dateString);
+		  return null;
+	},
+	dateToString(date: Date) {
+		const day = String(date.getDate()).padStart(2, '0'); 
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const year = date.getFullYear();
+		return `${year}-${month}-${day}`;
+	  }
 };
 export default Meth;

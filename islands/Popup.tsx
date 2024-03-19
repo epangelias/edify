@@ -16,7 +16,7 @@ export function Popup({fields: _fields, Values, path}: {fields: Field[], Values:
 		const value = Values.value.find(val => val.key.at(-1) == ID);
 		// if(!value)return alert("Entry does not exist of ID " +ID);
 		if(value)SetDataToFields(fields.value, value.value);
-		else fields.value.forEach(field => field.value = "");
+		else fields.value.forEach(field => field.value = field.defaultValue || "");
 		setAction("/edify/edit/" + path.join("/") + "/" + ID);
 		fields.value = [...fields.value];
 		modal.showModal();

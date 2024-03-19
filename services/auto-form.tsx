@@ -6,6 +6,7 @@ export interface Field {
 	placeholder?: string;
 	label?: string;
 	value?: string | Date;
+	defaultValue?: string | Date;
 	required?: boolean;
 	maxLength?: number;
 	minLength?: number;
@@ -144,7 +145,7 @@ function valueToString(value: unknown){
 }
 
 export function SetDataToFields(fields: Field[], data: { [key: string]: string }) {
-	fields.forEach((field) => field.value = valueToString(data[field.name]) || '');
+	fields.forEach((field) => field.value = valueToString(data[field.name]) || field.defaultValue || '');
 }
 
 export function ObjectToFields(obj: Record<string, object>): Field[] {

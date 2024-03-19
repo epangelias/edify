@@ -15,7 +15,6 @@ interface SortState {
 export interface Props {
 	columns: string[];
 	rows: Cell[][];
-	deleteCommand: Function;
 }
 
 export default function EntriesTable(props: Props) {
@@ -63,7 +62,6 @@ export default function EntriesTable(props: Props) {
 									{maxLen(cell.value, 100)}
 								</td>
 							))}
-							{props.deleteCommand && <td tabIndex={0} onClick={() => props.deleteCommand(rowID)}>🗑️</td>}
 						</tr>
 					))}
 				</tbody>
