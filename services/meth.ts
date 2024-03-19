@@ -27,10 +27,8 @@ const Meth = {
 	string(x: unknown) {
 		return typeof x == 'object' ? JSON.stringify(x, null, 2) : x + '';
 	},
-	arrayEquals(a: Array<unknown>, b: Array<unknown>) {
-		return a.length === b.length && a.every((value, index) => value === b[index]);
-	},
-	objHas(obj: unknown, v: PropertyKey) {
+	objHas(obj: unknown, v?: PropertyKey) {
+		if(!v)return false;
 		return Object.prototype.hasOwnProperty.call(obj, v);
 	},
 	objectToMap(obj: Record<string, unknown>): Map<string, unknown> {

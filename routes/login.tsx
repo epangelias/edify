@@ -1,10 +1,7 @@
 import { Field } from '../services/auto-form.tsx';
-import Meth from '../services/meth.ts';
 import { FreshContext } from '$fresh/server.ts';
 import { validateAndAuthorize } from '../services/user.tsx';
 import { Page } from '../components/Page.tsx';
-import { Redirect } from '../services/web.ts';
-import { GetFormDataAndValidate } from '../services/auto-form.tsx';
 import { AutoForm } from '../islands/AutoForm.tsx';
 import { ValidateFormData } from '../services/auto-form.tsx';
 
@@ -25,11 +22,7 @@ export const handler = {
 			const data = await req.json();
 			ValidateFormData(data, fields);
 			const authCode = await validateAndAuthorize(data.username, data.password);
-			const cookie = {
-				name: 'auth',
-				value: authCode,
-				days: 90,
-			};
+			const cookie = { name: 'auth', value: authCode, days: 90 };
 			return Response.json({
 				message: 'Success, redirecting...',
 				redirect: '/edify',

@@ -24,7 +24,7 @@ export default function EntriesTable({ path, values, fields }: Props) {
 			const cols = columns.map((col, j) => {
 				if(j == 0)return { value: <a href={link}>{r.key.at(-1) as string}</a> };
 				let value = Values.value[i].value[col];
-				if(typeof value == "boolean")value = value ? "✔️" : "❌";
+				if(typeof value == "boolean")value = value ? "◼" : "▢";
 				const date = Meth.stringToDate(value);
 				if(date)value = Meth.dateToString(date);
 				return { value };
@@ -62,13 +62,13 @@ export default function EntriesTable({ path, values, fields }: Props) {
 	}
 
 	function newCommand() {
-		const ID = prompt('Enter ID');
+		const ID = prompt('Enter Key. Must be lowercase and use -s for spaces. Must be unique.');
 		if (ID) window.location.href = '##' + ID;
 	}
 
 	return (
 		<div>
-			<div className='table-bar accent-bg'>
+			<div className='table-bar'>
 				<input
 					class='table-search'
 					type='search'

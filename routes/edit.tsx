@@ -6,6 +6,7 @@ import Editor from '../services/editor.tsx';
 import db from '../services/db.ts';
 import { EdifyConfig } from '../mod.ts';
 import { ExtractFormData } from '../services/auto-form.tsx';
+import { ValidateFormData } from '../services/auto-form.tsx';
 
 interface state  {
 		path: string[];
@@ -19,11 +20,11 @@ export async function handler(req: Request, ctx: FreshContext<state>) {
 	const title = path.join(' ▸ ') || 'Dashboard';
 
 	try {
-		const editor = await Editor(path, edifyConfig);
+		const {content, fields} = await Editor(path, edifyConfig);
 		if (req.method == 'POST') {
 			try {
 				const data = await req.json();
-				editor.validate(data);
+				ValidateFormData(data, fields);
 				const { ok } = await db.set(path, data);
 				if (!ok) throw new Error('Error saving data');
 				return Response.json({ message: 'Saved' });
@@ -32,10 +33,7 @@ export async function handler(req: Request, ctx: FreshContext<state>) {
 			}
 		}
 
-		return ctx.render({
-			content: await editor.getContent(),
-			title,
-		});
+		return ctx.render({ content, title });
 	} catch (e) {
 		if (e instanceof Redirect) return e;
 		return new Response(e.message);

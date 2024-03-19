@@ -119,11 +119,12 @@ interface formProps {
 	fields: Field[];
 	action?: string;
 	onSubmit?: (data: Record<string, unknown>) => void;
+	error?: string;
 }
 
-export function AutoForm({ fields, action, onSubmit }: formProps) {
+export function AutoForm({ fields, action, onSubmit, error }: formProps) {
 	const msg = useSignal('');
-	const err = useSignal('');
+	const err = useSignal(error ?? '');
 	const btn = useRef<HTMLButtonElement>(null);
 	const form = useRef<HTMLFormElement>(null);
 	

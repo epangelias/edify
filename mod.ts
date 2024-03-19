@@ -3,10 +3,17 @@ import AppView, { handler as appHandler } from './routes/edit.tsx';
 import LoginPage, { handler as loginHandler } from './routes/login.tsx';
 import { FreshContext, Plugin } from '$fresh/server.ts';
 import db from './services/db.ts';
-import type { DataType } from './services/data-types.tsx';
 import type { EditorPage } from './services/editor.tsx';
 import { getUserByAuth } from './services/user.tsx';
 import { GetCookies } from './services/web.ts';
+import { Field } from './services/auto-form.tsx';
+
+
+export interface DataType {
+	name: string;
+	fields: Field[];
+	ID?: string;
+}
 
 export interface EdifyConfig {
 	dataTypes: Record<string, DataType>;

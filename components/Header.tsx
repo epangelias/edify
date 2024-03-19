@@ -2,7 +2,7 @@ export function Header() {
 	return (
 		<header>
 			<div className='left'>
-				<a href='/'>◂ Back To Home</a>
+				<a href='/'>◂ Back To Website</a>
 			</div>
 			<div className='right'>
 				<a href='/edify/login'>
