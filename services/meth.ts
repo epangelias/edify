@@ -42,11 +42,8 @@ const Meth = {
 		}
 		return map;
 	},
-	formatDate(date: Date) {
-		const year = date.getFullYear();
-		const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is zero-based, so add 1
-		const day = date.getDate().toString().padStart(2, '0');
-		return `${year}-${month}-${day}`;
+	formatDate(date: Date | string) {
+		return new Date(date).toISOString().slice(0, 10);
 	},
 	async hashPassword(password: string) {
 		const encoder = new TextEncoder();

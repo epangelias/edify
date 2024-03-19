@@ -1,9 +1,10 @@
 import { useSignal } from '@preact/signals';
 import { useEffect, useState } from 'preact/hooks';
+import { JSX } from 'preact/jsx-runtime';
 
-export interface Cell {
-	value: string;
-	link: string;
+export interface Cell{
+	link: string,
+	value: string | JSX.Element;
 }
 
 interface SortState {
@@ -59,7 +60,7 @@ export default function EntriesTable(props: Props) {
 						<tr>
 							{row.map((cell, id) => (
 								<td scope='col' key={id}>
-									{cell.link ? <a href={cell.link}>{cell.value}</a> : maxLen(cell.value, 100)}
+									{maxLen(cell.value, 100)}
 								</td>
 							))}
 							{props.deleteCommand && <td tabIndex={0} onClick={() => props.deleteCommand(rowID)}>🗑️</td>}
@@ -72,6 +73,6 @@ export default function EntriesTable(props: Props) {
 }
 
 function maxLen(str: unknown, len: number) {
-	if (typeof str !== 'string') return null;
+	if (typeof str !== 'string') return str as JSX.Element;
 	return str.substring(0, len);
 }

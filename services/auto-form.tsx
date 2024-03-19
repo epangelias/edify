@@ -5,7 +5,7 @@ export interface Field {
 	type: 'text' | 'number' | 'email' | 'password' | 'submit' | 'textarea' | 'select' | 'checkbox' | 'hidden' | 'date';
 	placeholder?: string;
 	label?: string;
-	value?: string;
+	value?: string | Date;
 	required?: boolean;
 	maxLength?: number;
 	minLength?: number;
@@ -138,8 +138,13 @@ export async function GetFormDataAndValidate(req: Request, fields: Field[]) {
 	return data;
 }
 
+function valueToString(value: unknown){
+	if(value instanceof Date) return Meth.formatDate(value);
+	return value as string;
+}
+
 export function SetDataToFields(fields: Field[], data: { [key: string]: string }) {
-	fields.forEach((field) => field.value = data[field.name] || '');
+	fields.forEach((field) => field.value = valueToString(data[field.name]) || '');
 }
 
 export function ObjectToFields(obj: Record<string, object>): Field[] {

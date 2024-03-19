@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import Table, { Cell } from './Table.tsx';
 import { useSignal } from '@preact/signals';
 import { Popup } from './Popup.tsx';
+import { Field } from '../services/auto-form.tsx';
 
 export interface Props {
 	columns: string[];
@@ -12,20 +13,20 @@ export interface Props {
 }
 
 export default function EntriesTable({ path, values, fields }: Props) {
-	const columns = ['key', ...fields.map(f => f.name)];
+	const columns = ['Key',...fields.map(f => f.name)];
 
 	const Values = useSignal(values);
 
 	function getRows(){
 		return Values.value.map((r, i) => {
-			return columns.map((col, j) => {
-				const link = `##${r.key.at(-1)?.toString()}`
-				if (j == 0) return { value: r.key.at(-1), link };
-				if (!col) return { value: '' };
+			const link = `##${r.key.at(-1)?.toString()}`
+			const cols = columns.map((col, j) => {
+				if(j == 0)return { value: <a href={link}>{r.key.at(-1)}</a> };
 				let value = Values.value[i].value[col];
 				if(typeof value == "boolean")value = value ? "✔️" : "❌";
 				return { value };
 			});
+			return cols;
 		})
 	}
 

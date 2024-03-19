@@ -51,8 +51,15 @@ export function Popup({fields: _fields, Values, path}: {fields: Field[], Values:
 	function onSubmit(data: Record<string, unknown>){
 		const ID = document.location.hash.split("##")[1];
 		if(!ID)return;
-		const res = Values.value.find(val => val.key.at(-1) == ID);
-		if(!res)return;
+		let res = Values.value.find(val => val.key.at(-1) == ID);
+		if(!res){
+			res = {
+				key: [...path, ID],
+				value: data,
+				versionstamp: "1",
+			}; 
+			Values.value.push(res);
+		}
 		res.value = data;
 		Values.value = [...Values.value];
 		dialog.current?.close();

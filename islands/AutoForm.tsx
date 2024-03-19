@@ -66,6 +66,7 @@ function createInput(field: Field) {
 	if (field.type == 'textarea') return createTextarea(field);
 	else if (field.type == 'select') return createSelect(field);
 	else if (field.type == 'submit' && !field.value) field.value = 'Submit';
+	else if (field.type == 'date' && field.value) field.value = Meth.formatDate(field.value);
 	return (
 		<input
 			type={field.type}
