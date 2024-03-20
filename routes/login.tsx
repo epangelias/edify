@@ -4,6 +4,7 @@ import { validateAndAuthorize } from '../services/user.tsx';
 import { Page } from '../components/Page.tsx';
 import { AutoForm } from '../islands/AutoForm.tsx';
 import { ValidateFormData } from '../services/auto-form.tsx';
+import type { EdifyConfig } from '../mod.ts';
 
 export const fields: Field[] = [
 	{
@@ -17,7 +18,7 @@ export const fields: Field[] = [
 ];
 
 export const handler = {
-	async POST(req: Request, ctx: FreshContext) {
+	async POST(req: Request, ctx: FreshContext<{ edifyConfig: EdifyConfig }>) {
 		try {
 			const data = await req.json();
 			ValidateFormData(data, fields);
@@ -25,7 +26,7 @@ export const handler = {
 			const cookie = { name: 'auth', value: authCode, days: 90 };
 			return Response.json({
 				message: 'Success, redirecting...',
-				redirect: '/edify',
+				redirect: ctx.state.edifyConfig.basePath,
 				cookies: [cookie],
 			});
 		} catch (e) {
@@ -35,9 +36,9 @@ export const handler = {
 	},
 };
 
-export default function LoginPage({ data }: { data: { error?: string } }) {
+export default function LoginPage({ data, state }: FreshContext<{ edifyConfig: EdifyConfig }>) {
 	return (
-		<Page title='Login'>
+		<Page title='Login' state={state}>
 			<div
 				className='accent-bg'
 				style='padding: 2rem; margin-top: 2rem; border-radius: 1rem;'

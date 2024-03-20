@@ -8,19 +8,19 @@ import { EdifyConfig } from '../mod.ts';
 import { ExtractFormData } from '../services/auto-form.tsx';
 import { ValidateFormData } from '../services/auto-form.tsx';
 
-interface state  {
-		path: string[];
-		userData: UserData;
-		edifyConfig: EdifyConfig;
+interface state {
+	path: string[];
+	userData: UserData;
+	edifyConfig: EdifyConfig;
 }
 
 export async function handler(req: Request, ctx: FreshContext<state>) {
-	const { path, userData, edifyConfig } = ctx.state;
-	if (!userData) return new Redirect('/edify/login');
+	const { path, userData } = ctx.state;
+	if (!userData) return new Redirect(ctx.state.edifyConfig.basePath + '/login');
 	const title = path.join(' ▸ ') || 'Dashboard';
 
 	try {
-		const {content, fields} = await Editor(path, edifyConfig);
+		const { content, fields } = await Editor(ctx.state);
 		if (req.method == 'POST') {
 			try {
 				const data = await req.json();
@@ -40,9 +40,9 @@ export async function handler(req: Request, ctx: FreshContext<state>) {
 	}
 }
 
-export default function AppView({ data }: PageProps) {
+export default function AppView({ data, state }: PageProps) {
 	return (
-		<Page title={data.title}>
+		<Page title={data.title} state={state}>
 			{data.content}
 		</Page>
 	);

@@ -1,16 +1,13 @@
-export function Header() {
+import { AppState } from '../mod.ts';
+
+export function Header({ state: { userData, edifyConfig } }: { state: AppState }) {
 	return (
 		<header>
 			<div className='left'>
 				<a href='/'>◂ Back To Website</a>
 			</div>
 			<div className='right'>
-				<a href='/edify/login'>
-					Login
-				</a>&nbsp;
-				<a href='/edify/logout'>
-					Logout
-				</a>
+				{userData && <a href={edifyConfig.basePath + '/logout'}>Logout</a>}
 			</div>
 			<hr />
 		</header>

@@ -8,6 +8,11 @@ import { getUserByAuth } from './services/user.tsx';
 import { GetCookies } from './services/web.ts';
 import { Field } from './services/auto-form.tsx';
 
+export interface AppState {
+	userData: null | { id: string; username: string };
+	path: string[];
+	edifyConfig: EdifyConfig;
+}
 
 export interface DataType {
 	name: string;
@@ -18,10 +23,16 @@ export interface DataType {
 export interface EdifyConfig {
 	dataTypes: Record<string, DataType>;
 	editorPages: EditorPage[];
+	basePath: string;
+}
+
+export interface EdifyConfigInput {
+	dataTypes: Record<string, DataType>;
+	editorPages: EditorPage[];
 	basePath?: string;
 }
 
-export default function edifyPlugin(edifyConfig: EdifyConfig): Plugin {
+export default function edifyPlugin(edifyConfig: EdifyConfigInput): Plugin {
 	edifyConfig = {
 		basePath: '/edify',
 		...edifyConfig,
@@ -50,7 +61,7 @@ export default function edifyPlugin(edifyConfig: EdifyConfig): Plugin {
 			},
 			{
 				path: `${edifyConfig.basePath}/logout`,
-				handler: (req: Request) => new Redirect('/edify').setCookie(req, { name: 'auth', value: '', maxAge: 0 }),
+				handler: (req: Request) => new Redirect(edifyConfig.basePath as string).setCookie(req, { name: 'auth', value: '', maxAge: 0 }),
 			},
 			{
 				path: `${edifyConfig.basePath}/api/delete/[...path]`,
