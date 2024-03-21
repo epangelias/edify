@@ -49,7 +49,7 @@ export default function EntriesTable(props: Props) {
 								onClick={() => handleSortChange(column)}
 								tabIndex={0}
 							>
-								{column}
+								{formatName(column)}
 								{sortConfig.key === column && <span class='sort-icon'>{sortConfig.direction ? ' ▾' : ' ▴'}</span>}
 							</th>
 						))}
@@ -69,6 +69,11 @@ export default function EntriesTable(props: Props) {
 			</table>
 		</div>
 	);
+}
+
+function formatName(input: string) {
+	const regex = /[A-Z]/g;
+	return input.replace(regex, (match) => ` ${match}`);
 }
 
 function formatValue(str: unknown, len: number) {
