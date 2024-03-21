@@ -28,8 +28,8 @@ function createSelect(field: Field) {
 
 function createTextarea(field: Field) {
 	// Set textarea height to its content
-	function setHeight(noShrink:Event|false=false) {
-		if(!ref.current)return;
+	function setHeight(noShrink: Event | false = false) {
+		if (!ref.current) return;
 		if (ref.current.offsetHeight > ref.current.scrollHeight && noShrink) return;
 		ref.current.style.height = 'auto';
 		ref.current.style.height = Math.max(ref.current.scrollHeight, 24) + 4 + 'px';
@@ -127,7 +127,7 @@ export function AutoForm({ fields, action, onSubmit, error }: formProps) {
 	const err = useSignal(error ?? '');
 	const btn = useRef<HTMLButtonElement>(null);
 	const form = useRef<HTMLFormElement>(null);
-	
+
 	useEffect(() => {
 		err.value = '';
 		msg.value = '';
@@ -137,7 +137,7 @@ export function AutoForm({ fields, action, onSubmit, error }: formProps) {
 		e.preventDefault();
 
 		if (btn.current) btn.current.disabled = true;
-		
+
 		err.value = '';
 		msg.value = '';
 
@@ -153,7 +153,6 @@ export function AutoForm({ fields, action, onSubmit, error }: formProps) {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(data),
 			});
-			
 
 			if (!res.ok) {
 				throw new Error(`Request failed with status ${res.status}`);
@@ -171,7 +170,7 @@ export function AutoForm({ fields, action, onSubmit, error }: formProps) {
 
 			msg.value = result.message || 'Submitted';
 
-			if(onSubmit) onSubmit(data);
+			if (onSubmit) onSubmit(data);
 		} catch (e) {
 			console.error('Error submitting form:', e);
 			err.value = e.message;
@@ -180,8 +179,7 @@ export function AutoForm({ fields, action, onSubmit, error }: formProps) {
 		if (btn.current) btn.current.disabled = false;
 	}
 
-
-	const hasEnabledField = fields.some(field => !field.disabled);
+	const hasEnabledField = fields.some((field) => !field.disabled);
 
 	return (
 		<>
@@ -189,8 +187,8 @@ export function AutoForm({ fields, action, onSubmit, error }: formProps) {
 				{fields.map(createField)}
 				{hasEnabledField && <button ref={btn}>Submit</button>}
 			</form>
-			{err && <p class='form-error'>{err}</p>}
-			{msg && <p class='form-message'>{msg}</p>}
+			{err.value && <p class='form-error'>{err}</p>}
+			{msg.value && <p class='form-message'>{msg}</p>}
 		</>
 	);
 }
