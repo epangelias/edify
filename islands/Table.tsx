@@ -3,8 +3,8 @@ import { useEffect, useState } from 'preact/hooks';
 import { JSX } from 'preact/jsx-runtime';
 import Meth from '../services/meth.ts';
 
-export interface Cell{
-	link: string,
+export interface Cell {
+	link: string;
 	value: string | JSX.Element;
 }
 
@@ -60,7 +60,7 @@ export default function EntriesTable(props: Props) {
 						<tr>
 							{row.map((cell, id) => (
 								<td scope='col' key={id}>
-									{formatValue(cell.value, 100)}
+									{formatValue(cell.value, 50)}
 								</td>
 							))}
 						</tr>
@@ -72,11 +72,11 @@ export default function EntriesTable(props: Props) {
 }
 
 function formatValue(str: unknown, len: number) {
-	const date = Meth.stringToDate(str)
-	if(date)return <span style={{color: 'color-mix(in srgb, orange, currentColor)'}}>{date.toDateString()}</span>;
+	const date = Meth.stringToDate(str);
+	if (date) return <span style={{ color: 'color-mix(in srgb, orange, currentColor)' }}>{date.toDateString()}</span>;
 	else if (typeof str == 'object') return str as JSX.Element;
-	else if(typeof str == 'string') return str.substring(0, len);
-	else if(typeof str == 'number') return <code style={{color: 'color-mix(in srgb, green, currentColor)', fontSize: "1rem"}}>{str}</code>;
-	else if(typeof str == 'boolean') return <span style={{scale: "1.5", display: "inline-block"}}>{str ? "◼" : "◻"}</span>;
+	else if (typeof str == 'string') return str.substring(0, len);
+	else if (typeof str == 'number') return <code style={{ color: 'color-mix(in srgb, green, currentColor)', fontSize: '1rem' }}>{str}</code>;
+	else if (typeof str == 'boolean') return <span style={{ scale: '1.5', display: 'inline-block' }}>{str ? '◼' : '◻'}</span>;
 	return str;
 }
