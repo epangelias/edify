@@ -2,6 +2,7 @@ import { ComponentChildren } from 'preact';
 import { Header } from './Header.tsx';
 import { EdifyConfig } from '../mod.ts';
 import { AppState } from '../mod.ts';
+import { Partial } from '$fresh/runtime.ts';
 
 interface Props {
 	title?: string;
@@ -21,12 +22,14 @@ export function Page({ title, heading, children, noHeading, state, ...props }: P
 				<title>{title ? `${title} | Edify` : 'Edify'}</title>
 				<link rel='stylesheet' href='/css/editor.css' />
 			</head>
-			<body>
+			<body f-client-nav>
 				<Header state={state} />
-				<main {...props}>
-					{!noHeading && heading && <h1>{heading}</h1>}
-					{children}
-				</main>
+				<Partial name='main'>
+					<main {...props}>
+						{!noHeading && heading && <h1>{heading}</h1>}
+						{children}
+					</main>
+				</Partial>
 			</body>
 		</html>
 	);
