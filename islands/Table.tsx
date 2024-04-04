@@ -6,6 +6,7 @@ import Meth from '../services/meth.ts';
 export interface Cell {
 	link: string;
 	value: string | JSX.Element;
+	text: string;
 }
 
 interface SortState {

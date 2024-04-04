@@ -29,9 +29,9 @@ export default function EntriesTable({ path, values, fields, state }: Props) {
 		Rows.value = Values.value.map((r, i) => {
 			const link = `##${r.key.at(-1)?.toString()}`;
 			const cols = columns.map((col, j) => {
-				if (j == 0) return { value: <a href={link}>{r.key.at(-1) as string}</a> };
+				if (j == 0) return { value: <a href={link}>{r.key.at(-1) as string}</a>, text: r.key.at(-1) };
 				const value = Values.value[i].value[col];
-				return { value };
+				return { value, text: value };
 			});
 			async function deleteCommand() {
 				if (searchTerm) return alert('Cannot delete with active filter');
@@ -61,6 +61,36 @@ export default function EntriesTable({ path, values, fields, state }: Props) {
 		if (ID) window.location.href = '##' + ID;
 	}
 
+	function exportCommand() {
+		const rows = Rows.value.map((row) => {
+			const obj = row.reduce((obj, cell, index) => {
+				obj[columns[index]] = cell.text;
+				return obj;
+			}, {});
+			delete obj.undefined;
+			return JSON.stringify(obj);
+		});
+
+		const jsonlContent = rows.join('\n');
+		console.log(jsonlContent);
+
+		const blob = new Blob([jsonlContent], { type: 'application/jsonl' });
+		const url = URL.createObjectURL(blob);
+
+		const link = document.createElement('a');
+		link.setAttribute('href', url);
+		link.setAttribute('download', 'data.jsonl');
+		document.body.appendChild(link); // Required for Firefox
+
+		link.click();
+
+		// Clean up the temporary URL
+		setTimeout(() => {
+			URL.revokeObjectURL(url);
+			link.remove();
+		}, 0);
+	}
+
 	return (
 		<div>
 			<div className='table-bar'>
@@ -73,6 +103,7 @@ export default function EntriesTable({ path, values, fields, state }: Props) {
 					autoFocus
 				/>
 				<button onClick={newCommand}>New</button>
+				<button onClick={exportCommand} style='float:right'>Export</button>
 			</div>
 			<Table columns={columns} rows={filteredRows()} />
 			<Popup path={path} Values={Values} fields={fields} state={state} />
