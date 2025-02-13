@@ -78,7 +78,7 @@ export default function edifyPlugin(edifyConfig: EdifyConfigInput): Plugin {
 					handler: async (req: Request, ctx: FreshContext) => {
 						ctx.state.userData = await getUserByAuth(GetCookies(req.headers).auth);
 						ctx.state.path = ctx.params?.path?.split('/');
-						console.log("paht", ctx.state.path);
+						console.log("paht", ctx.params, req.url);
 						ctx.state.edifyConfig = edifyConfig;
 						return ctx.next();
 					},
