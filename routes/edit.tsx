@@ -17,6 +17,7 @@ interface state {
 export async function handler(req: Request, ctx: FreshContext<state>) {
 	const { path, userData } = ctx.state;
 	if (!userData) return new Redirect(ctx.state.edifyConfig.basePath + '/login');
+	console.log(ctx.state);
 	const title = path?.join(' ▸ ') || 'Dashboard';
 
 	try {
