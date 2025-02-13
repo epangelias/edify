@@ -79,7 +79,7 @@ export default function edifyPlugin(edifyConfig: EdifyConfigInput): Plugin {
 						ctx.state.userData = await getUserByAuth(GetCookies(req.headers).auth);
 						ctx.state.path = ctx.params?.path?.split('/');
 						console.log("path", ctx.params, 'url', req.url);
-						ctx.state.path = req.url.split('/');
+						ctx.state.path = req.url.split("/").slice(5);
 						ctx.state.edifyConfig = edifyConfig;
 						return ctx.next();
 					},
