@@ -15,10 +15,11 @@ interface state {
 }
 
 export async function handler(req: Request, ctx: FreshContext<state>) {
-	const { path, userData } = ctx.state;
+	let { path, userData } = ctx.state;
+	if (!path) path = req.url.split('/');
+	console.log(path);
 	if (!userData) return new Redirect(ctx.state.edifyConfig.basePath + '/login');
-	console.log(ctx.state);
-	const title = path?.join(' ▸ ') || 'Dashboard';
+	const title = path.join(' ▸ ') || 'Dashboard';
 
 	try {
 		const { content, fields } = await Editor(ctx.state);
