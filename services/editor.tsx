@@ -15,7 +15,7 @@ export interface EditorPage {
 }
 
 function pathMatches(path: string[], path2: string) {
-	if (path2 == path.join('/')) return true;
+	if (path2 == path?.join('/')) return true;
 	if (path2 == path.slice(0, -1).join('/') + '/*') return true;
 	return false;
 }
